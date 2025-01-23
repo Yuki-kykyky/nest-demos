@@ -1,6 +1,6 @@
 export interface ITask {
-  id: number;
-  name: string;
+  id: string;
+  title: string;
   description: string;
   status: ETaskStatus;
 }
