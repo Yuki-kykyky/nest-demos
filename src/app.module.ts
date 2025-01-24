@@ -10,9 +10,17 @@ import { ConfigModule } from "@nestjs/config";
 import { appConfig } from "./config/app.config";
 import { appConfigSchema } from "./config/config.type";
 import { typeOrmConfig } from "./config/database.config";
+import { TypeOrmModule } from "@nestjs/typeorm";
 
 @Module({
   imports: [
+    // TypeOrmModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService<ConfigType>) => ({
+    //     ...configService.get("database"),
+    //   }),
+    // }),
     ConfigModule.forRoot({
       load: [appConfig, typeOrmConfig],
       validationSchema: appConfigSchema,
@@ -21,6 +29,7 @@ import { typeOrmConfig } from "./config/database.config";
         abortEarly: true,
       },
     }),
+    TypeOrmModule.forRoot(typeOrmConfig()),
     TasksModule,
   ],
   controllers: [AppController],
