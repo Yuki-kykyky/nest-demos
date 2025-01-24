@@ -9,11 +9,12 @@ import { TasksService } from "./tasks/tasks.service";
 import { ConfigModule } from "@nestjs/config";
 import { appConfig } from "./config/app.config";
 import { appConfigSchema } from "./config/config.type";
+import { typeOrmConfig } from "./config/database.config";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [appConfig],
+      load: [appConfig, typeOrmConfig],
       validationSchema: appConfigSchema,
       validationOptions: {
         // allowUnknown: false,
