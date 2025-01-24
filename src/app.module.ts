@@ -6,21 +6,23 @@ import { LoggerService } from "./logger/logger.service";
 import { MessageFormatter } from "./MessageFormatter";
 import { TasksModule } from "./tasks/tasksModule";
 import { TasksService } from "./tasks/tasks.service";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { appConfig } from "./config/app.config";
 import { appConfigSchema } from "./config/config.type";
 import { typeOrmConfig } from "./config/database.config";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { TypedConfigService } from "./config/typed-config.service";
 
 @Module({
   imports: [
-    // TypeOrmModule.forRootAsync({
-    //   imports: [ConfigModule],
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService<ConfigType>) => ({
-    //     ...configService.get("database"),
-    //   }),
-    // }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: TypedConfigService) => ({
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        ...configService.get("database"),
+      }),
+    }),
     ConfigModule.forRoot({
       load: [appConfig, typeOrmConfig],
       validationSchema: appConfigSchema,
@@ -29,7 +31,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
         abortEarly: true,
       },
     }),
-    TypeOrmModule.forRoot(typeOrmConfig()),
+    // TypeOrmModule.forRoot(typeOrmConfig()),
     TasksModule,
   ],
   controllers: [AppController],
@@ -39,6 +41,10 @@ import { TypeOrmModule } from "@nestjs/typeorm";
     LoggerService,
     MessageFormatter,
     TasksService,
+    {
+      provide: TypedConfigService,
+      useClass: TypedConfigService,
+    },
   ],
 })
 export class AppModule {}
