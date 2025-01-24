@@ -12,6 +12,7 @@ import { appConfigSchema } from "./config/config.type";
 import { typeOrmConfig } from "./config/database.config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TypedConfigService } from "./config/typed-config.service";
+import { TaskEntity } from "./tasks/task.entity";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TypedConfigService } from "./config/typed-config.service";
       useFactory: (configService: TypedConfigService) => ({
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         ...configService.get("database"),
+        entities: [TaskEntity],
       }),
     }),
     ConfigModule.forRoot({
