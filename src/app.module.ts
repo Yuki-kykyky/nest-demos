@@ -8,11 +8,17 @@ import { TasksModule } from "./tasks/tasksModule";
 import { TasksService } from "./tasks/tasks.service";
 import { ConfigModule } from "@nestjs/config";
 import { appConfig } from "./config/app.config";
+import { appConfigSchema } from "./config/config.type";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [appConfig],
+      validationSchema: appConfigSchema,
+      validationOptions: {
+        // allowUnknown: false,
+        abortEarly: true,
+      },
     }),
     TasksModule,
   ],
