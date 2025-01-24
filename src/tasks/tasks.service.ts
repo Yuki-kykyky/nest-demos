@@ -1,36 +1,35 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { ETaskStatus, ITask } from "./task.model";
 import { CreateTaskDto } from "./create-task.dto";
-import { randomUUID } from "crypto";
 import { UpdateTaskDto } from "./update-task.dto";
 import { WrongTaskStatusException } from "./exception/wrongTaskStatus.exception";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Task } from "./task.entity";
 
 @Injectable()
 export class TasksService {
-  private tasks: ITask[] = [];
+  constructor(
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
+  ) {}
 
-  public findAll(): ITask[] {
-    return this.tasks;
+  public async findAll(): Promise<Task[]> {
+    return await this.taskRepository.find();
   }
 
-  public findOne(id: string): ITask {
-    const task = this.tasks.find((task) => task.id === id);
-    if (!task) {
-      throw new NotFoundException(`Task with ID ${id} not found`);
-    }
-    return task;
+  public async findOne(id: string): Promise<Task | null> {
+    return await this.taskRepository.findOneBy({ id });
   }
 
-  public create(createTaskDto: CreateTaskDto): ITask {
-    const task: ITask = {
-      id: randomUUID(),
-      ...createTaskDto,
-    };
-    this.tasks.push(task);
-    return task;
+  public async create(createTaskDto: CreateTaskDto): Promise<Task> {
+    return await this.taskRepository.save(createTaskDto);
   }
 
-  public updateStatus(task: ITask, updateTaskDto: UpdateTaskDto): ITask {
+  public async updateStatus(
+    task: ITask,
+    updateTaskDto: UpdateTaskDto,
+  ): Promise<Task> {
     if (updateTaskDto.status) {
       if (!this.isValidateStatus(updateTaskDto.status)) {
         throw new WrongTaskStatusException();
@@ -43,7 +42,7 @@ export class TasksService {
     if (updateTaskDto.description) {
       task.description = updateTaskDto.description;
     }
-    return task;
+    return await this.taskRepository.save(task);
   }
 
   /*
