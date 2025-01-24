@@ -6,9 +6,16 @@ import { LoggerService } from "./logger/logger.service";
 import { MessageFormatter } from "./MessageFormatter";
 import { TasksModule } from "./tasks/tasksModule";
 import { TasksService } from "./tasks/tasks.service";
+import { ConfigModule } from "@nestjs/config";
+import { appConfig } from "./config/app.config";
 
 @Module({
-  imports: [TasksModule],
+  imports: [
+    ConfigModule.forRoot({
+      load: [appConfig],
+    }),
+    TasksModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
