@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { ETaskStatus } from "./task.model";
+import { User } from "../users/user.entity";
+import { TaskLabel } from "./task-label.entity";
 
 @Entity()
 export class Task {
@@ -24,4 +32,13 @@ export class Task {
     default: ETaskStatus.OPEN,
   })
   status: ETaskStatus;
+
+  @Column()
+  userId: string;
+
+  @ManyToOne(() => User, (user) => user.tasks, { nullable: false })
+  user: User;
+
+  @OneToMany(() => TaskLabel, (taskLabel) => taskLabel.task)
+  labels: TaskLabel[];
 }
