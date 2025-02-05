@@ -16,6 +16,7 @@ import { Task } from "./tasks/task.entity";
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Task]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
