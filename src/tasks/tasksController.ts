@@ -1,8 +1,11 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
 import { CreateTaskDto } from "./create-task.dto";
 import { FindOneParams } from "./find-one.params";
 import { Task } from "./task.entity";
+import { CreateTaskLabelDto } from "./create-task-label.dto";
+import { UpdateTaskDto } from "./update-task.dto";
+import { WrongTaskStatusException } from "./exception/wrongTaskStatus.exception";
 
 @Controller("tasks")
 export class TasksController {
@@ -23,19 +26,36 @@ export class TasksController {
     return this.tasksService.findOne(params.id);
   }
 
-  // @Patch("/:id/status")
-  // public updateStatus(
-  //   @Param() params: FindOneParams,
-  //   @Body() updateTaskDto: UpdateTaskDto,
-  // ): Promise<Task> {
-  //   const task = this.findOneOrFail(params.id);
-  //   try {
-  //     return this.tasksService.updateStatus(task, updateTaskDto);
-  //   } catch (e) {
-  //     if (e instanceof WrongTaskStatusException) {
-  //       throw new WrongTaskStatusException();
-  //     }
-  //     throw e;
-  //   }
-  // }
+  @Post("/:id/labels")
+  public async addLabelToTask(
+    @Param() { id }: FindOneParams,
+    @Body() createTaskLabelDto: CreateTaskLabelDto[],
+  ): Promise<Task> {
+    const task = await this.findOneOrFail(id);
+    return this.tasksService.addLabelToTask(task, createTaskLabelDto);
+  }
+
+  @Patch("/:id/status")
+  public async updateStatus(
+    @Param() params: FindOneParams,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ): Promise<Task> {
+    const task = await this.findOneOrFail(params.id);
+    try {
+      return this.tasksService.updateStatus(task, updateTaskDto);
+    } catch (e) {
+      if (e instanceof WrongTaskStatusException) {
+        throw new WrongTaskStatusException();
+      }
+      throw e;
+    }
+  }
+
+  private async findOneOrFail(id: string): Promise<Task> {
+    const task = await this.tasksService.findOne(id);
+    if (!task) {
+      throw new Error("Task not found");
+    }
+    return task;
+  }
 }

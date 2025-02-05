@@ -18,7 +18,7 @@ import { TaskLabel } from "./tasks/task-label.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Task]),
+    TypeOrmModule.forFeature([Task, TaskLabel, User]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
