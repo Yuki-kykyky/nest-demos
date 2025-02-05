@@ -3,12 +3,16 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 
 @Entity()
+// avoid duplicate labels for the same task
+@Unique(["name", "taskId"])
 export class TaskLabel {
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -16,10 +20,12 @@ export class TaskLabel {
   @Column()
   name: string;
 
+  // faster queries
+  @Index()
   @Column()
   taskId: string;
 
-  @ManyToOne(() => Task)
+  @ManyToOne(() => Task, (task) => task.labels, { onDelete: "CASCADE" })
   task: Task;
 
   @CreateDateColumn()
