@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from "@nestjs/common";
 import { TasksService } from "./tasks.service";
 import { CreateTaskDto } from "./create-task.dto";
 import { FindOneParams } from "./find-one.params";
@@ -6,14 +14,15 @@ import { Task } from "./task.entity";
 import { CreateTaskLabelDto } from "./create-task-label.dto";
 import { UpdateTaskDto } from "./update-task.dto";
 import { WrongTaskStatusException } from "./exception/wrongTaskStatus.exception";
+import { FilterTaskParams } from "./filter-task.params";
 
 @Controller("tasks")
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  public async findAll(): Promise<Task[]> {
-    return await this.tasksService.findAll().then((tasks) => tasks);
+  public async findAll(@Query() filter: FilterTaskParams): Promise<Task[]> {
+    return await this.tasksService.findAll(filter).then((tasks) => tasks);
   }
 
   @Post()

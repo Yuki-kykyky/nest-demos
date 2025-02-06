@@ -8,6 +8,7 @@ import { CreateTaskLabelDto } from "./create-task-label.dto";
 import { UpdateTaskDto } from "./update-task.dto";
 import { ETaskStatus, ITask } from "./task.model";
 import { WrongTaskStatusException } from "./exception/wrongTaskStatus.exception";
+import { FilterTaskParams } from "./filter-task.params";
 
 @Injectable()
 export class TasksService {
@@ -18,8 +19,13 @@ export class TasksService {
     private labelRepository: Repository<TaskLabel>,
   ) {}
 
-  public async findAll(): Promise<Task[]> {
-    return await this.taskRepository.find();
+  public async findAll(filter: FilterTaskParams): Promise<Task[]> {
+    return await this.taskRepository.find({
+      where: {
+        status: filter.status,
+      },
+      relations: ["labels"],
+    });
   }
 
   public async findOne(id: string): Promise<Task | null> {
