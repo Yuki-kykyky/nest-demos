@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { CreateTaskDto } from "./create-task.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { FindOptionsWhere, Like, Repository } from "typeorm";
 import { Task } from "./task.entity";
 import { TaskLabel } from "./task-label.entity";
 import { CreateTaskLabelDto } from "./create-task-label.dto";
@@ -21,13 +21,20 @@ export class TasksService {
   ) {}
 
   public async findAll(
-    filter: FilterTaskParams,
+    filters: FilterTaskParams,
     pagination: PaginationParams,
   ): Promise<[Task[], number]> {
+    const where: FindOptionsWhere<Task> = {};
+    if (filters.status) {
+      where.status = filters.status;
+    }
+    // both title and description should satisfy the condition
+    if (filters.search?.trim()) {
+      where.title = Like(`%${filters.search}%`);
+      where.description = Like(`%${filters.search}%`);
+    }
     return await this.taskRepository.findAndCount({
-      where: {
-        status: filter.status,
-      },
+      where,
       relations: ["labels"],
       skip: pagination.offset,
       take: pagination.limit,

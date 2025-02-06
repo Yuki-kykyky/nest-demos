@@ -24,10 +24,10 @@ export class TasksController {
 
   @Get()
   public async findAll(
-    @Query() filter: FilterTaskParams,
+    @Query() filters: FilterTaskParams,
     @Query() pagination: PaginationParams,
   ): Promise<PaginationResponse<Task>> {
-    const [items, total] = await this.tasksService.findAll(filter, pagination);
+    const [items, total] = await this.tasksService.findAll(filters, pagination);
     return {
       data: items,
       meta: {
