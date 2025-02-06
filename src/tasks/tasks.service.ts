@@ -39,6 +39,8 @@ export class TasksService {
       );
     }
 
+    query.orderBy(`task.${filters.sortBy}`, filters.sortOrder);
+
     query.skip(pagination.offset).take(pagination.limit);
     return query.getManyAndCount();
   }
