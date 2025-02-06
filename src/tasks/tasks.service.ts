@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { CreateTaskDto } from "./create-task.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindOptionsWhere, Like, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { Task } from "./task.entity";
 import { TaskLabel } from "./task-label.entity";
 import { CreateTaskLabelDto } from "./create-task-label.dto";
@@ -24,21 +24,23 @@ export class TasksService {
     filters: FilterTaskParams,
     pagination: PaginationParams,
   ): Promise<[Task[], number]> {
-    const where: FindOptionsWhere<Task> = {};
+    const query = this.taskRepository
+      .createQueryBuilder("task")
+      .leftJoinAndSelect("task.labels", "labels");
+
     if (filters.status) {
-      where.status = filters.status;
+      query.andWhere("task.status = :status", { status: filters.status });
     }
-    // both title and description should satisfy the condition
+    // OR Logic
     if (filters.search?.trim()) {
-      where.title = Like(`%${filters.search}%`);
-      where.description = Like(`%${filters.search}%`);
+      query.andWhere(
+        "(task.title ILIKE :search OR task.description ILIKE :search)",
+        { search: `%${filters.search}%` },
+      );
     }
-    return await this.taskRepository.findAndCount({
-      where,
-      relations: ["labels"],
-      skip: pagination.offset,
-      take: pagination.limit,
-    });
+
+    query.skip(pagination.offset).take(pagination.limit);
+    return query.getManyAndCount();
   }
 
   public async findOne(id: string): Promise<Task | null> {
