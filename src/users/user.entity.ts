@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Task } from "../tasks/task.entity";
+import { Expose } from "class-transformer";
 
 @Entity()
 export class User {
@@ -14,8 +15,10 @@ export class User {
   id: number;
 
   @Column()
+  @Expose()
   name: string;
 
+  @Expose()
   @Column()
   email: string;
 

@@ -17,13 +17,17 @@ export class UserService {
     return await this.userRepository.findOneBy({ email });
   }
 
+  // question: how to test the result of this method? can it be achieved at service level?
   public async createUser(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await this.passwordService.hash(
       createUserDto.password,
     );
-    return await this.userRepository.save({
+    // make sure to create an instance of the User entity
+    const user = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
     });
+    // then save it to the database
+    return await this.userRepository.save(user);
   }
 }
