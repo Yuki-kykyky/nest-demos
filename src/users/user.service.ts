@@ -30,4 +30,8 @@ export class UserService {
     // then save it to the database
     return await this.userRepository.save(user);
   }
+
+  public async findOne(id: string): Promise<User | null> {
+    return await this.userRepository.findOneBy({ id });
+  }
 }
