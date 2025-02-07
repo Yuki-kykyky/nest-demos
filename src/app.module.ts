@@ -17,6 +17,10 @@ import { User } from "./users/user.entity";
 import { TaskLabel } from "./tasks/task-label.entity";
 import { authConfig } from "./config/auth.config";
 import { PasswordService } from "./users/password/password.service";
+import { UserService } from "./users/user.service";
+import { AuthController } from "./users/auth.controller";
+import { AuthService } from "./users/auth/auth.service";
+import { JwtService } from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -41,7 +45,7 @@ import { PasswordService } from "./users/password/password.service";
     // TypeOrmModule.forRoot(typeOrmConfig()),
     TasksModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, AuthController],
   providers: [
     AppService,
     DummyService,
@@ -53,6 +57,9 @@ import { PasswordService } from "./users/password/password.service";
       useClass: TypedConfigService,
     },
     PasswordService,
+    UserService,
+    AuthService,
+    JwtService,
   ],
 })
 export class AppModule {}
